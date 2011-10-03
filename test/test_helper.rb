@@ -13,7 +13,4 @@ $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 $LOAD_PATH.unshift(File.dirname(__FILE__))
 require 'param_protection'
 require 'test_request_with_params'
-require 'sanitizer'
-
-class Test::Unit::TestCase
-end
+require 'ruby-debug'
