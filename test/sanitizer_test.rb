@@ -7,13 +7,13 @@ end
 class SanitizerTest < ActiveSupport::TestCase
 
   setup do
-    @hash = {:user => {:type => {:admin => {:login => 'slawosz',:email => 'slawosz@gmail.com',:password => 'secret'}},:photo => 'slawosz.jpg',:job => 'developer'},:url => 'example.org',:language => 'ruby'}
+    @hash = {:user => {:type => {:admin => {:login => 'slawosz',:email => 'slawosz@gmail.com',:password => 'secret'}},:photo => 'slawosz.jpg',:job => 'developer'},:url => 'slawosz.github.com',:language => 'ruby'}
   end
 
   test 'should remove one key' do
     @hash.sanitize!(:user)
 
-    expected = {:url => 'example.org',:language => 'ruby'}
+    expected = {:url => 'slawosz.github.com',:language => 'ruby'}
     assert_equal expected, @hash
 
     hash = {:user => 'slawosz',:framework => 'rails',:lang => 'ruby'}
@@ -39,14 +39,14 @@ class SanitizerTest < ActiveSupport::TestCase
 
   test 'should preserve two keys' do
     @hash.sanitize_except!(:user, :url)
-    expected = {:user => {:type => {:admin => {:login => 'slawosz',:email => 'slawosz@gmail.com',:password => 'secret'}},:photo => 'slawosz.jpg',:job => 'developer'},:url => 'example.org'}
+    expected = {:user => {:type => {:admin => {:login => 'slawosz',:email => 'slawosz@gmail.com',:password => 'secret'}},:photo => 'slawosz.jpg',:job => 'developer'},:url => 'slawosz.github.com'}
     assert_equal expected, @hash
   end
 
   test 'should remove one key from nested hash' do
     @hash.sanitize!(:user => :type)
 
-    expected = {:user => {:photo => 'slawosz.jpg',:job => 'developer'},:url => 'example.org',:language => 'ruby'}
+    expected = {:user => {:photo => 'slawosz.jpg',:job => 'developer'},:url => 'slawosz.github.com',:language => 'ruby'}
     assert_equal expected, @hash
   end
 
@@ -58,7 +58,7 @@ class SanitizerTest < ActiveSupport::TestCase
 
   test 'should remove two keys from nested hash' do
     @hash.sanitize!(:user => [:type, :photo])
-    expected = {:user => {:job => 'developer'},:url => 'example.org',:language => 'ruby'}
+    expected = {:user => {:job => 'developer'},:url => 'slawosz.github.com',:language => 'ruby'}
     assert_equal expected, @hash
   end
 
@@ -70,7 +70,7 @@ class SanitizerTest < ActiveSupport::TestCase
 
   test 'should remove one key in deep nested hash' do
     @hash.sanitize!(:user => {:type => {:admin => :login}})
-    expected = {:user => {:type => {:admin => {:email => 'slawosz@gmail.com',:password => 'secret'}},:photo => 'slawosz.jpg',:job => 'developer'},:url => 'example.org',:language => 'ruby'}
+    expected = {:user => {:type => {:admin => {:email => 'slawosz@gmail.com',:password => 'secret'}},:photo => 'slawosz.jpg',:job => 'developer'},:url => 'slawosz.github.com',:language => 'ruby'}
     assert_equal expected, @hash
   end
 
@@ -82,7 +82,7 @@ class SanitizerTest < ActiveSupport::TestCase
 
   test 'should remove two keys in deep nested hash' do
     @hash.sanitize!(:user => {:type => {:admin => [:login, :email]}})
-    expected = {:user => {:type => {:admin => {:password => 'secret'}},:photo => 'slawosz.jpg',:job => 'developer'},:url => 'example.org',:language => 'ruby'}
+    expected = {:user => {:type => {:admin => {:password => 'secret'}},:photo => 'slawosz.jpg',:job => 'developer'},:url => 'slawosz.github.com',:language => 'ruby'}
     assert_equal expected, @hash
   end
 

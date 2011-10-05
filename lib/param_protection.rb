@@ -5,6 +5,8 @@ require 'active_support/core_ext/hash/deep_dup'
 require 'active_support/core_ext/hash/deep_merge'
 
 module RailsParamsProtection
+  class ParamsFilteringDefinitionMismatch < Exception; end
+
   module Api
     extend ActiveSupport::Concern
 
@@ -15,14 +17,18 @@ module RailsParamsProtection
 
     module ClassMethods
 
-      def protected_params(params)
+      def params_protected(*params)
         self._protected_parameters ||= []
-        self._protected_parameters << params
+        params.each do |param|
+          self._protected_parameters << param
+        end
       end
 
-      def allowed_params(params)
+      def params_accessible(*params)
         self._allowed_parameters ||= []
-        self._allowed_parameters << params
+        params.each do |param|
+          self._allowed_parameters << param
+        end
       end
 
     end
@@ -35,6 +41,9 @@ module RailsParamsProtection
 
       private
       def protect_parameters(request)
+        if self.class._allowed_parameters.present? && self.class._protected_parameters.present?
+          raise ParamsFilteringDefinitionMismatch
+        end
         request.parameters.class.class_eval do
           include RailsParamsProtection::Sanitizer
         end
@@ -51,11 +60,10 @@ module RailsParamsProtection
       end
 
       def process_protected_parameters(request)
-        protected_parameters = {}
         self.class._protected_parameters.each do |param|
-          protected_parameters.deep_merge!(request.parameters.deep_dup.sanitize!(param))
+          request.parameters.sanitize!(param)
         end
-        request.params = protected_parameters
+        request.params
       end
     end
   end

@@ -39,6 +39,7 @@ module RailsParamsProtection
           end
         end
       end
+      self
     end
 
   end
