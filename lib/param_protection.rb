@@ -4,7 +4,7 @@ require 'sanitizer'
 require 'active_support/core_ext/hash/deep_dup'
 require 'active_support/core_ext/hash/deep_merge'
 
-module RailsParamsProtection
+module RailsParamProtection
   class ParamsFilteringDefinitionMismatch < Exception; end
 
   module Api
@@ -45,7 +45,7 @@ module RailsParamsProtection
           raise ParamsFilteringDefinitionMismatch
         end
         request.parameters.class.class_eval do
-          include RailsParamsProtection::Sanitizer
+          include RailsParamProtection::Sanitizer
         end
         process_allowed_parameters(request) if self.class._allowed_parameters.present?
         process_protected_parameters(request) if self.class._protected_parameters.present?
@@ -72,7 +72,7 @@ end
 module ActionController
 
   class Base
-    include RailsParamsProtection::Api
+    include RailsParamProtection::Api
   end
 
 end

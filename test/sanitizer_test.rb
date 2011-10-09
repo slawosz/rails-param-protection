@@ -1,7 +1,7 @@
 require File.expand_path('test_helper', File.dirname(__FILE__))
 
 class Hash
-  include RailsParamsProtection::Sanitizer
+  include RailsParamProtection::Sanitizer
 end
 
 class SanitizerTest < ActiveSupport::TestCase

@@ -147,7 +147,7 @@ class TestParamProtection < ActiveSupport::TestCase
   test "should raise error when both filtering exists in controller" do
     params = {:user => {:type => {:admin => {:login => 'slawosz',:email => 'slawosz@gmail.com',:password => 'secret'}},:photo => 'slawosz.jpg',:job => 'developer'},:url => 'slawosz.github.com',:language => 'ruby'}
 
-    assert_raise RailsParamsProtection::ParamsFilteringDefinitionMismatch do
+    assert_raise RailsParamProtection::ParamsFilteringDefinitionMismatch do
       process(WrongParamsFilteringDefinition, params)
     end
 
@@ -164,7 +164,7 @@ class TestParamProtection < ActiveSupport::TestCase
   test "should raise error when both filtering exists in controller inheritance hierarchy" do
     params = {:user => {:type => {:admin => {:login => 'slawosz',:email => 'slawosz@gmail.com',:password => 'secret'}},:photo => 'slawosz.jpg',:job => 'developer'},:url => 'slawosz.github.com',:language => 'ruby'}
 
-    assert_raise RailsParamsProtection::ParamsFilteringDefinitionMismatch do
+    assert_raise RailsParamProtection::ParamsFilteringDefinitionMismatch do
       process(SubWrongParamsFilteringDefinition, params)
     end
 

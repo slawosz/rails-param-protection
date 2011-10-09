@@ -14,7 +14,7 @@ require 'rake'
 require 'jeweler'
 Jeweler::Tasks.new do |gem|
   # gem is a Gem::Specification... see http://docs.rubygems.org/read/chapter/20 for more options
-  gem.name = "param_protection"
+  gem.name = "rails-param-protection"
   gem.homepage = "http://github.com/slawosz/param_protection"
   gem.license = "MIT"
   gem.summary = %Q{TODO: one-line summary of your gem}
@@ -47,7 +47,7 @@ Rake::RDocTask.new do |rdoc|
   version = File.exist?('VERSION') ? File.read('VERSION') : ""
 
   rdoc.rdoc_dir = 'rdoc'
-  rdoc.title = "param_protection #{version}"
+  rdoc.title = "rails-param-protection #{version}"
   rdoc.rdoc_files.include('README*')
   rdoc.rdoc_files.include('lib/**/*.rb')
 end

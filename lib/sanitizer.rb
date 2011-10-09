@@ -1,4 +1,4 @@
-module RailsParamsProtection
+module RailsParamProtection
   module Sanitizer
 
     def sanitize!(*args)
