@@ -15,10 +15,10 @@ require 'jeweler'
 Jeweler::Tasks.new do |gem|
   # gem is a Gem::Specification... see http://docs.rubygems.org/read/chapter/20 for more options
   gem.name = "rails-param-protection"
-  gem.homepage = "http://github.com/slawosz/param_protection"
+  gem.homepage = "http://github.com/slawosz/rails-param-protection"
   gem.license = "MIT"
-  gem.summary = %Q{TODO: one-line summary of your gem}
-  gem.description = %Q{TODO: longer description of your gem}
+  gem.summary = %Q{Erase specific parameters from rails request}
+  gem.description = %Q{Gem provides two methods: params_protected to denote which params will be erased from request and params_accessible to denote only allowed params. Inspired by merb-param-protection. }
   gem.email = "slawosz@gmail.com"
   gem.authors = ["Sławosz Sławiński"]
   # dependencies defined in Gemfile
