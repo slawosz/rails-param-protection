@@ -1,28 +1,67 @@
-= rails-param-protection
+# rails-param-protection
 
-This gem provides two methods for Rails Controller: params_accesible and params protected.
+This gem provides two methods for Rails Controller: `params_accesible` and `params_protected`.
 
-==== params_protected
+#### params_protected
 
-params_protected macro is used to denote which params will be erase from parameters hash
+`params_protected` macro is used to denote which params will be erase from parameters hash
 
-    class ArticleController < ApplicationController
-      params_protected :foo
-    end
+```ruby
+  class ArticleController < ApplicationController
+    params_protected :foo
+  end
+```
 
-for request params {:article => {:title => 'Foo', :content => 'Bar', :foo => 'FooBar'}}
+for request params `{:article => {:title => 'Foo', :content => 'Bar', :foo => 'FooBar'}}`
 
-controller will get {:article => {:title => 'Foo', :content => 'Bar'}}
+controller will get `{:article => {:title => 'Foo', :content => 'Bar'}}`
 
-==== params_accessible
+#### params_accessible
 
-params_accessible macro is used to denote which params will be preserve from parameres hash
+`params_accessible` macro is used to denote which params will be preserve from parameres hash
 
-When both declaration is present in controller or in controller inheritance hierarchy, then RailsParamProtection::ParamsFilteringDefinitionMismatch will be thrown.
+```ruby
+  class ArticleController < ApplicationController
+    params_protected :article => [:title]
+  end
+```
+
+for request params `{:article => {:title => 'Foo', :content => 'Bar', :foo => 'FooBar'}}`
+
+controller will get `{:article => {:title => 'Foo'}}`
+
+#### RailsParamProtection::ParamsFilteringDefinitionMismatch
+
+When both declaration are present in controller or in controller inheritance hierarchy,
+then `RailsParamProtection::ParamsFilteringDefinitionMismatch` will be thrown.
 
 Inspired by [https://github.com/wycats/merb/tree/master/merb-param-protection](merb-param-protection)
 
-== Contributing to param_protection
+#### arguments
+
+both `param_protection` and `params_accesible` arguments points which parameters will be preserved or deleted
+
+with given request params: `{:article => {:title => 'Foo', :content => 'Bar', :foo => 'FooBar', :comment => {:title => 'comment', :author => 'author'}}, :controller => 'controller'}`
+
+```ruby
+  params_accessible :article, :controller
+```
+
+will preserve all params
+
+```ruby
+  params_accessible :article => [:title, :content]
+
+then parameters will become `{:article => {:title => 'Foo', :content => 'Bar'}}`
+
+```ruby
+  params_accessible :article => {:comment => [:title]}
+```
+
+then parameters become `{:article => {:comment => {:title => 'comment'}}}`
+
+
+## Contributing to param_protection
 
 * Check out the latest master to make sure the feature hasn't been implemented or the bug hasn't been fixed yet
 * Check out the issue tracker to make sure someone already hasn't requested it and/or contributed it
@@ -32,7 +71,7 @@ Inspired by [https://github.com/wycats/merb/tree/master/merb-param-protection](m
 * Make sure to add tests for it. This is important so I don't break it in a future version unintentionally.
 * Please try not to mess with the Rakefile, version, or history. If you want to have your own version, or is otherwise necessary, that is fine, but please isolate to its own commit so I can cherry-pick around it.
 
-== Copyright
+## Copyright
 
 Copyright (c) 2011 Sławosz Sławiński. See LICENSE.txt for
 further details.

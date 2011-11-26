@@ -34,9 +34,10 @@ module RailsParamProtection
     end
 
     module InstanceMethods
-      def dispatch(action, request)
+      # should be process_action like in actionpack/lib/action_controller/metal/params_wrapper.rb
+      def process_action(*args)
         protect_parameters(request)
-        super(action, request)
+        super
       end
 
       private
@@ -56,14 +57,15 @@ module RailsParamProtection
         self.class._allowed_parameters.each do |param|
           allowed_parameters.deep_merge!(request.parameters.deep_dup.sanitize_except!(param))
         end
-        request.params = allowed_parameters
+        request.parameters.replace allowed_parameters
+        request.request_parameters.replace allowed_parameters
       end
 
       def process_protected_parameters(request)
         self.class._protected_parameters.each do |param|
           request.parameters.sanitize!(param)
+          request.request_parameters.sanitize!(param)
         end
-        request.params
       end
     end
   end

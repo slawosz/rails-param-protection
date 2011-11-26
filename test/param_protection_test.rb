@@ -1,10 +1,14 @@
 require File.expand_path('test_helper', File.dirname(__FILE__))
-require 'action_controller'
 
-class TestParamProtection < ActiveSupport::TestCase
+class TestParamProtection < ActionController::TestCase
 
   class BaseController < ActionController::Base
+    class << self
+      attr_accessor :last_parameters
+    end
+
     def index
+      self.class.last_parameters = request.params.except(:controller, :action)
       render :nothing => true
     end
   end
@@ -16,7 +20,7 @@ class TestParamProtection < ActiveSupport::TestCase
   test "should remove protected parameter" do
     params = {:user => 'slawosz',:framework => 'rails',:lang => 'ruby'}
 
-    result = process(ParamsProtectedController, params)
+    result = _process(ParamsProtectedController, params)
 
     assert_equal ({:user => 'slawosz',:lang => 'ruby'}), result
   end
@@ -28,7 +32,7 @@ class TestParamProtection < ActiveSupport::TestCase
   test "should preserve allowed parameter" do
     params = {:user => 'slawosz',:framework => 'rails',:lang => 'ruby'}
 
-    result = process(ParamsAccessibleController, params)
+    result = _process(ParamsAccessibleController, params)
 
     assert_equal ({:framework => 'rails'}), result
   end
@@ -44,7 +48,7 @@ class TestParamProtection < ActiveSupport::TestCase
   test "remember accessible parameters from superclass" do
     params = {:user => 'slawosz',:framework => 'rails',:lang => 'ruby'}
 
-    result = process(BarAllowedController, params)
+    result = _process(BarAllowedController, params)
 
     assert_equal ({:framework => 'rails', :user => 'slawosz'}), result
   end
@@ -57,7 +61,7 @@ class TestParamProtection < ActiveSupport::TestCase
   test "use parameters from each declaration" do
     params = {:user => 'slawosz',:framework => 'rails',:lang => 'ruby'}
 
-    result = process(MultipleAllowedParamsDefinitionsController, params)
+    result = _process(MultipleAllowedParamsDefinitionsController, params)
 
     assert_equal ({:framework => 'rails', :user => 'slawosz'}), result
   end
@@ -73,7 +77,7 @@ class TestParamProtection < ActiveSupport::TestCase
   test "remember protected parameters from superclass" do
     params = {:user => 'slawosz',:framework => 'rails',:lang => 'ruby'}
 
-    result = process(BarProtectedController, params)
+    result = _process(BarProtectedController, params)
 
     assert_equal ({:lang => 'ruby'}), result
   end
@@ -86,7 +90,7 @@ class TestParamProtection < ActiveSupport::TestCase
   test "protect parameters from each declaration" do
     params = {:user => 'slawosz',:framework => 'rails',:lang => 'ruby'}
 
-    result = process(MultipleProtectedParamsDefinitionsController, params)
+    result = _process(MultipleProtectedParamsDefinitionsController, params)
 
     assert_equal ({:lang => 'ruby'}), result
   end
@@ -98,7 +102,7 @@ class TestParamProtection < ActiveSupport::TestCase
   test "should allow two params" do
     params = {:user => {:type => {:admin => {:login => 'slawosz',:email => 'slawosz@gmail.com',:password => 'secret'}},:photo => 'slawosz.jpg',:job => 'developer'},:url => 'slawosz.github.com',:language => 'ruby'}
 
-    result = process(TwoAllowedParamsController, params)
+    result = _process(TwoAllowedParamsController, params)
 
     assert_equal ({:user => {:type => {:admin => {:login => 'slawosz',:email => 'slawosz@gmail.com'}}}, :url => 'slawosz.github.com'}), result
   end
@@ -110,7 +114,7 @@ class TestParamProtection < ActiveSupport::TestCase
   test "should protect two params" do
     params = {:user => {:type => {:admin => {:login => 'slawosz',:email => 'slawosz@gmail.com',:password => 'secret'}},:photo => 'slawosz.jpg',:job => 'developer'},:url => 'slawosz.github.com',:language => 'ruby'}
 
-    result = process(TwoProtectedParamsController, params)
+    result = _process(TwoProtectedParamsController, params)
 
     assert_equal ({:user => {:type => {:admin => {:password => 'secret'}},:photo => 'slawosz.jpg',:job => 'developer'},:language => 'ruby'}), result
   end
@@ -122,7 +126,7 @@ class TestParamProtection < ActiveSupport::TestCase
   test "should allow one param using complex definition" do
     params = {:user => {:type => {:admin => {:login => 'slawosz',:email => 'slawosz@gmail.com',:password => 'secret'}},:photo => 'slawosz.jpg',:job => 'developer'},:url => 'slawosz.github.com',:language => 'ruby'}
 
-    result = process(OneComplexAllowedParamsController, params)
+    result = _process(OneComplexAllowedParamsController, params)
 
     assert_equal ({:user => {:type => {:admin => {:login => 'slawosz',:email => 'slawosz@gmail.com'}}}}), result
   end
@@ -134,7 +138,7 @@ class TestParamProtection < ActiveSupport::TestCase
   test "should protect one param using complex definition" do
     params = {:user => {:type => {:admin => {:login => 'slawosz',:email => 'slawosz@gmail.com',:password => 'secret'}},:photo => 'slawosz.jpg',:job => 'developer'},:url => 'slawosz.github.com',:language => 'ruby'}
 
-    result = process(OneComplexProtectedParamsController, params)
+    result = _process(OneComplexProtectedParamsController, params)
 
     assert_equal ({:user => {:type => {:admin => {:password => 'secret'}},:photo => 'slawosz.jpg',:job => 'developer'},:url => 'slawosz.github.com',:language => 'ruby'}), result
   end
@@ -148,7 +152,7 @@ class TestParamProtection < ActiveSupport::TestCase
     params = {:user => {:type => {:admin => {:login => 'slawosz',:email => 'slawosz@gmail.com',:password => 'secret'}},:photo => 'slawosz.jpg',:job => 'developer'},:url => 'slawosz.github.com',:language => 'ruby'}
 
     assert_raise RailsParamProtection::ParamsFilteringDefinitionMismatch do
-      process(WrongParamsFilteringDefinition, params)
+      _process(WrongParamsFilteringDefinition, params)
     end
 
   end
@@ -165,17 +169,30 @@ class TestParamProtection < ActiveSupport::TestCase
     params = {:user => {:type => {:admin => {:login => 'slawosz',:email => 'slawosz@gmail.com',:password => 'secret'}},:photo => 'slawosz.jpg',:job => 'developer'},:url => 'slawosz.github.com',:language => 'ruby'}
 
     assert_raise RailsParamProtection::ParamsFilteringDefinitionMismatch do
-      process(SubWrongParamsFilteringDefinition, params)
+      _process(SubWrongParamsFilteringDefinition, params)
     end
 
   end
 
+  test "should work without params" do
+    result = _process(OneComplexProtectedParamsController, nil)
+    assert result.blank?
+
+    result = _process(OneComplexAllowedParamsController, nil)
+    assert result.blank?
+
+    result = _process(OneComplexProtectedParamsController, {})
+    assert result.blank?
+
+    result = _process(OneComplexAllowedParamsController, {})
+    assert result.blank?
+  end
+
   private
-  def process(controller, params)
-    request = ActionDispatch::TestRequestWithParams.new
-    request.params = params
-    controller_instance = controller.new
-    dispatched = controller_instance.dispatch('index', request)
-    controller_instance.params
+  def _process(controller, params)
+    @controller = controller.is_a?(Class) ? controller.new : controller
+
+    get :index, params
+    @controller.class.last_parameters.symbolize_keys
   end
 end
